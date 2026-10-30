@@ -15,7 +15,7 @@ Construir una aplicación web ligera con Vite que sirva como módulo base de sof
 **Pruebas**: Vitest con jsdom para pruebas unitarias y de interacción  
 **Plataforma Objetivo**: Navegadores modernos de escritorio y móviles  
 **Tipo de Proyecto**: Aplicación web  
-**Objetivos de Rendimiento**: Interacciones responsivas para listas de hasta 500 registros; la búsqueda y las actualizaciones de la interfaz deben sentirse instantáneas  
+**Objetivos de Rendimiento**: búsqueda y renderizado de listas <= 100 ms para 500 registros; actualizaciones de lista sin re-render completo del documento  
 **Restricciones**: Huella mínima de librerías, despliegue simple, sin backend requerido; la estructura debe mantenerse extensible para módulos personalizados  
 **Escala/Alcance**: Módulo base con CRUD de datos maestros (Entidad) y documentos transaccionales (Documento), búsqueda y capacidades de navegación
 
@@ -23,10 +23,11 @@ Construir una aplicación web ligera con Vite que sirva como módulo base de sof
 
 *COMPROBACIÓN: Debe pasar antes de la investigación de la Fase 0. Reverificar tras el diseño de la Fase 1.*
 
-- Calidad: La implementación usará una estructura JavaScript pequeña y modular con límites de función claros y nomenclatura consistente, manteniendo las preocupaciones base (almacenamiento, identidad, integridad referencial) separadas de la lógica específica del dominio para que los módulos personalizados puedan extenderlas.
-- Pruebas: Los flujos centrales de crear, editar, eliminar y buscar estarán cubiertos por pruebas automatizadas antes de completar.
-- Experiencia de Usuario: La interfaz proporcionará mensajes de validación claros, estados vacíos y comportamiento de formulario consistente, presentados dentro de un marco de espacio de trabajo ERP con marca (barra superior + barra lateral) que se ve y se comporta idénticamente en todas las pantallas.
-- Rendimiento: La búsqueda y el renderizado de listas se optimizarán para colecciones de hasta 500 registros usando actualizaciones ligeras del DOM.
+- **I. Base modular y configuración única**: PASA. Todo punto de adaptación (nombre, etiquetas, campos personalizados, ciclo de vida, color de acento) vive en `src/module-config.js`; el código central no contiene términos de dominio.
+- **II. Test-First (NO NEGOCIABLE)**: PASA CON CONDICIÓN. Los flujos centrales requieren pruebas Vitest escritas antes de la implementación; las tareas T001–T081 deben marcarse completas solo cuando existan sus pruebas y pasen.
+- **III. UX de workspace consistente**: PASA. `shell.js` posee barra superior y barra lateral; todas las etiquetas derivan de la configuración; se exige accesibilidad (`aria-current`, foco, etiquetas).
+- **IV. Rendimiento medible**: PASA. Objetivo numérico <= 100 ms para 500 registros con actualizaciones dirigidas del DOM (FR-027, SC-004).
+- **V. Simplicidad y local-first**: PASA. Sin backend, sin framework pesado, persistencia en localStorage, dependencias mínimas.
 
 ## Estructura del Proyecto
 
@@ -53,10 +54,13 @@ src/
 ├── app.js
 ├── module-config.js
 └── components/
-    ├── shell.js        (marco del espacio de trabajo: barra superior, logotipo SVG, barra lateral, estado de módulo activo)
-    ├── dashboard.js    (vista de inicio: cuadrícula de acciones rápidas + tarjetas de estadísticas en vivo)
-    ├── entity-form.js  (formulario de creación/edición de entidades con campos personalizados)
-    └── document-form.js (formulario de creación/edición de documentos con campos personalizados y ciclo de vida de estados)
+    ├── shell.js         (marco del espacio de trabajo: barra superior, logotipo SVG, barra lateral, estado de módulo activo)
+    ├── dashboard.js     (vista de inicio: cuadrícula de acciones rápidas + tarjetas de estadísticas en vivo)
+    ├── entity-form.js   (formulario de creación/edición de entidades con campos personalizados)
+    ├── entity-list.js   (lista de entidades con controles de edición/eliminación y validación)
+    ├── document-form.js (formulario de creación/edición de documentos con campos personalizados y ciclo de vida)
+    ├── document-list.js (lista de documentos asociados a una entidad)
+    └── search-bar.js    (interfaz de búsqueda de entidades)
 
 tests/
 ├── unit/

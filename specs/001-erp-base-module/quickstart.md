@@ -1,55 +1,50 @@
-# Inicio Rápido: Sistema ERP Integral
+# Inicio Rápido: Módulo Base ERP
 
 ## Configuración
 
-1. Instalar dependencias según el stack seleccionado
-2. Crear base de datos y ejecutar esquema basado en `data-model.md`
-3. Configurar conexión a base de datos
-4. Iniciar aplicación
+1. Instalar dependencias: `npm install`
+2. Iniciar el servidor de desarrollo: `npm run dev`
+3. Abrir la URL local que muestra Vite
+4. Ejecutar las pruebas: `npm test`
+5. Compilar para producción: `npm run build`
 
 ## Estructura de Datos
 
-El sistema sigue el modelo relacional completo definido en `data-model.md` con:
-- 8 módulos principales + datos maestros compartidos
-- Relaciones entre módulos debidamente definidas
-- Referencias polimórficas para mayor flexibilidad
-- Integridad referencial garantizada
+El módulo usa localStorage con un modelo simple (ver `data-model.md`):
+- **Entidades**: datos maestros con campos base y campos personalizados.
+- **Documentos**: registros transaccionales vinculados a una entidad por `entity_id`.
+- **Configuración**: `src/module-config.js` define nombre, etiquetas, campos, ciclo de vida y color de acento.
 
 ## Flujo de Trabajo Típico
 
-### Orden-a-Cobro
-1. Crear cliente en CRM
-2. Crear oportunidad y cotización
-3. Convertir cotización a orden de venta
-4. Verificar inventario y embarcar
-5. Generar factura por cobrar
-6. Aplicar recibo de cliente
+### Crear una entidad y un documento
+1. Abrir el Panel y elegir "Nueva entidad".
+2. Completar el formulario y guardar.
+3. Elegir "Nuevo documento" y seleccionar la entidad creada.
+4. Completar los detalles del documento y guardar.
+5. Verificar que el documento aparece vinculado a su entidad.
 
-### Compra-a-Pago
-1. Crear solicitud de compra
-2. Enviar RFQ a proveedores
-3. Comparar cotizaciones y generar orden de compra
-4. Recibir mercancía
-5. Generar factura por pagar
-6. Aplicar pago a proveedor
+### Adaptar el módulo a un dominio (p. ej., Ventas)
+1. Editar `src/module-config.js`.
+2. Definir `moduleName` y `labels` (Entidad→Cliente, Documento→Pedido de Venta).
+3. Declarar `customFields` si se necesitan campos extra.
+4. Opcional: definir `statusLifecycle` y `theme.accentColor`.
+5. Recargar y verificar que toda la interfaz usa la nueva terminología.
 
-### Fabricación
-1. Crear BOM y ruta para producto
-2. Generar orden de producción (puede vincularse a orden de venta)
-3. Consumir materiales
-4. Registrar producción terminada
-5. Actualizar inventario
+### Buscar
+1. Navegar a Búsqueda (barra lateral o acción rápida del Panel).
+2. Introducir un término; se buscan campos base y personalizados.
+3. Ver resultados o un estado vacío claro.
 
 ## Validación
 
-- Verificar integridad referencial entre módulos
-- Validar relaciones circulares (departamentos-gerentes)
-- Validar referencias polimórficas
-- Verificar balanceo de asientos contables
-- Validar trazabilidad entre documentos
+- Guardar entidades/documentos inválidos debe mostrar errores por campo y no persistir.
+- Eliminar una entidad debe eliminar en cascada sus documentos.
+- Una configuración inválida debe caer a valores por defecto con un mensaje legible.
+- El contenido de usuario debe mostrarse escapado (sin ejecutar HTML/script).
+- Con 500 registros, búsqueda y renderizado deben mantenerse < 100 ms.
 
 ## Referencias
 
-- Modelo de datos completo: `data-model.md`
-- Diagrama ERD: `erp_erd.mermaid`
+- Modelo de datos: `data-model.md`
 - Contratos: `contracts/`

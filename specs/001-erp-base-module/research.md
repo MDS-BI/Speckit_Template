@@ -1,26 +1,25 @@
-# Investigación: Sistema ERP Integral
+# Investigación: Módulo Base ERP
 
-## Decisión: Seguir modelo relacional definido en data-model.md
+## Decisión: Aplicación Vite estática con persistencia en localStorage
 
-**Justificación**: El modelo relacional proporciona una estructura completa y probada para un sistema ERP, cubriendo todos los módulos empresariales con sus relaciones correctas, referencias cruzadas entre módulos y patrones ERP estándar.
+**Justificación**: El módulo base debe ser ligero, desplegable como sitio estático y sin backend. Vite ofrece un entorno de desarrollo y compilación simple; localStorage cubre la persistencia de una única instancia del módulo sin infraestructura adicional.
 
 ## Decisiones Arquitectónicas
 
-- **Datos maestros compartidos**: `companies`, `addresses`, `currencies`, `tax_codes` son compartidos por todos los módulos
-- **Maestro de productos unificado**: `products` en el módulo de inventario sirve como fuente única para ventas, compras, fabricación y calidad
-- **Referencias polimórficas**: Usadas para `journal_entries`, `inventory_transactions`, `quality_inspections` con resolución a nivel de aplicación
-- **Relación circular**: `departments.manager_employee_id` ↔ `employees.department_id` manejada con nullable y poblamiento diferido
-- **Trazabilidad completa**: Cadena orden-a-cobro y compra-a-pago completamente rastreable
-- **Claves primarias**: Enteros surrogate (`<tabla>_id`), excepto claves naturales donde aplique
+- **Sin backend**: toda la persistencia ocurre en el navegador (`localStorage`). Esto mantiene el despliegue simple y el alcance acotado (FR-007, FR-029).
+- **JavaScript vanilla modular**: sin framework de UI pesado; componentes pequeños con responsabilidades claras (shell, dashboard, formularios, listas, búsqueda).
+- **Configuración como único punto de adaptación**: `src/module-config.js` centraliza nombre, etiquetas, campos personalizados, ciclo de vida de estados y color de acento (FR-016–FR-019, FR-023).
+- **Persistencia desacoplada de la UI**: `src/storage.js` concentra el modelo, la validación y la integridad referencial (cascada entidad→documentos) para que la interfaz no dependa del almacén concreto.
+- **Identificadores generados por la aplicación**: `entity_id` y `document_id` se generan al crear el registro; no hay autoincremento relacional (ver `data-model.md`).
+- **Renderizado seguro y dirigido**: el contenido de usuario se escapa antes de insertarse en el DOM (FR-024) y las actualizaciones de listas son dirigidas para sostener el objetivo de <= 100 ms con 500 registros (FR-027).
+- **Pruebas con Vitest + jsdom**: pruebas unitarias de almacenamiento/validación/configuración y pruebas de integración de los flujos de interfaz (FR-028).
 
-## Módulos Implementados
+## Alternativas Consideradas
 
-1. **Core/Shared** - Datos maestros compartidos
-2. **HR/Payroll** - Gestión de recursos humanos y nómina
-3. **Finance/Accounting** - Contabilidad, cuentas por cobrar/pagar, activos
-4. **Logistics/Inventory** - Inventario, almacenes, embarques
-5. **CRM** - Gestión de relaciones con clientes
-6. **Sales** - Ventas, cotizaciones, órdenes
-7. **Procurement/Purchasing** - Compras, proveedores
-8. **Operations/Manufacturing** - Producción, BOM, rutas
-9. **Quality Control** - Inspecciones, no conformidades
+- **Framework de UI (React/Vue)**: descartado por el requisito de huella mínima y despliegue simple.
+- **Backend + base de datos relacional**: descartado en el módulo base por el objetivo de simplicidad; los módulos de negocio podrán añadirlo después.
+- **Persistencia en memoria**: descartado porque los datos deben sobrevivir a recargas (FR-007).
+
+## Alcance
+
+Este módulo base no implementa módulos ERP de negocio (RRHH, Finanzas, Logística, CRM, Ventas, Compras, Fabricación, Calidad). Quedan fuera de alcance y se construirán sobre esta base en funcionalidades posteriores.
