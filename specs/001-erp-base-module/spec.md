@@ -18,6 +18,15 @@ El alcance es deliberadamente acotado al módulo base. Los módulos ERP de negoc
 - **Módulo / vista**: pantalla de primer nivel del espacio de trabajo: Panel, Gestión de entidades, Gestión de documentos, Búsqueda.
 - **Configuración del módulo**: objeto exportado por `src/module-config.js` que adapta el módulo base a un dominio.
 - **Campos personalizados**: campos declarados en la configuración y renderizados dinámicamente en formularios, listas y búsqueda.
+- **Código**: identificador legible y único de una entidad, además de su nombre.
+
+## Clarifications
+
+### Session 2026-10-30
+
+- Q: When a user creates an entity, which fields must be filled in before it can be saved? → A: `name` plus a unique `code`.
+- Q: Which records and fields should the search screen look through? → A: Entities only: `name`, `code`, `description`, and custom fields.
+- Q: When the search term is empty, what should the search screen show? → A: Show all entities, unfiltered.
 
 ## Escenarios de Usuario y Pruebas *(obligatorio)*
 
@@ -29,7 +38,7 @@ Como usuario de negocio, quiero crear entidades y verlas en una lista para organ
 **Prueba Independiente**: Un usuario abre la aplicación, envía el formulario de entidad y ve la nueva entidad aparecer en la lista.
 
 **Escenarios de Aceptación**:
-1. **Dado** que el usuario está en el formulario de entidad, **cuando** introduce un nombre válido y guarda, **entonces** la entidad se persiste y aparece en la lista.
+1. **Dado** que el usuario está en el formulario de entidad, **cuando** introduce un nombre y un código válidos y únicos y guarda, **entonces** la entidad se persiste y aparece en la lista.
 2. **Dado** un formulario con campos obligatorios vacíos, **cuando** el usuario guarda, **entonces** se muestran errores por campo y no se persiste nada.
 
 ---
@@ -195,13 +204,13 @@ Como usuario, quiero un marco persistente con barra superior y barra lateral par
 ## Requisitos Funcionales
 
 ### Gestión de entidades
-- **FR-001**: El sistema DEBE permitir crear entidades con validación de campos obligatorios y persistirlas.
+- **FR-001**: El sistema DEBE permitir crear entidades con validación de campos obligatorios (`name` y `code`; `code` DEBE ser único entre entidades) y persistirlas.
 - **FR-002**: El sistema DEBE permitir editar entidades existentes y reflejar los cambios en la lista.
 - **FR-003**: El sistema DEBE permitir eliminar entidades y eliminar en cascada todos sus documentos.
 
 ### Búsqueda
-- **FR-004**: El sistema DEBE buscar entidades en tiempo real por campos base y campos personalizados, sin distinguir mayúsculas ni acentos.
-- **FR-005**: El sistema DEBE mostrar un estado vacío claro cuando una búsqueda no tiene coincidencias o el término está vacío.
+- **FR-004**: El sistema DEBE buscar entidades en tiempo real por `name`, `code`, `description` y campos personalizados, sin distinguir mayúsculas ni acentos.
+- **FR-005**: El sistema DEBE mostrar un estado vacío claro cuando una búsqueda no tiene coincidencias.
 
 ### Validación y persistencia
 - **FR-006**: El sistema DEBE validar entidades, documentos y configuración con mensajes de error consistentes asociados al campo.
@@ -241,7 +250,7 @@ Como usuario, quiero un marco persistente con barra superior y barra lateral par
 
 - **SC-001**: Crear, editar o eliminar una entidad actualiza la lista en < 100 ms y sin errores en consola.
 - **SC-002**: Eliminar una entidad elimina el 100% de sus documentos (verificado por prueba automatizada).
-- **SC-003**: Una búsqueda devuelve únicamente coincidencias por nombre, descripción, notas o campos personalizados.
+- **SC-003**: Una búsqueda devuelve únicamente coincidencias por nombre, código, descripción o campos personalizados.
 - **SC-004**: Con 500 entidades, la búsqueda y el renderizado de la lista permanecen < 100 ms y la interfaz sigue interactiva.
 - **SC-005**: Con una configuración de Ventas, todas las etiquetas visibles cambian y no aparece ningún término base filtrado.
 - **SC-006**: Una configuración ausente o inválida cae a los valores por defecto y muestra un mensaje legible sin fallar.
@@ -251,9 +260,10 @@ Como usuario, quiero un marco persistente con barra superior y barra lateral par
 ## Casos Límite
 
 - Entidad sin nombre o con campos obligatorios vacíos → error por campo, no se guarda.
+- Entidad con `code` duplicado → error de validación asociado al campo, no se guarda.
 - Entidad con documentos eliminada → se eliminan también los documentos (cascada).
 - Configuración ausente, parcial o inválida → valores por defecto + un mensaje legible.
-- Búsqueda con término vacío → mostrar todos o mantener estado, sin filtrar.
+- Búsqueda con término vacío → mostrar todas las entidades, sin filtrar.
 - Búsqueda sin coincidencias → estado vacío claro con opción de reintentar.
 - 500 registros → búsqueda y renderizado < 100 ms.
 - Documento con estado no permitido por el ciclo de vida → rechazado con explicación.

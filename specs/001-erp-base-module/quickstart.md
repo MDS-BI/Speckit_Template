@@ -33,7 +33,7 @@ El módulo usa localStorage con un modelo simple (ver `data-model.md`):
 
 ### Buscar
 1. Navegar a Búsqueda (barra lateral o acción rápida del Panel).
-2. Introducir un término; se buscan campos base y personalizados.
+2. Introducir un término; se buscan nombre, código, descripción y campos personalizados.
 3. Ver resultados o un estado vacío claro.
 
 ## Validación

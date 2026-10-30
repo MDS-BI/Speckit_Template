@@ -17,19 +17,12 @@ Buscar en los siguientes campos (si existen):
 **Campos base de Entity:**
 - `name`
 - `code`
-- `taxId`
-- `email`
-- `phone`
-- `address`
-- `category`
 - `description`
-- `targetDate`
-- `paymentTerms`
 
 **Campos personalizados de Entity:**
 - Todos los valores de `customFields` cuyo `target === 'entity'` definidos en la configuración actual (FR-019)
 
-**Nota:** `id`, `entity_id`, `createdAt`, `updatedAt` típicamente no se buscan por defecto, pero el contrato permite incluirlos solo si hay razón explícita. Para este módulo base, los anteriores son suficientes.
+**Nota:** `id`, `entity_id`, `taxId`, `email`, `phone`, `address`, `category`, `targetDate`, `paymentTerms`, `createdAt`, `updatedAt` no se buscan en este módulo base (decisión de clarificación: solo `name`, `code`, `description` y campos personalizados).
 
 ## Reglas de coincidencia
 
@@ -37,7 +30,7 @@ Buscar en los siguientes campos (si existen):
 - **Case-insensitive** (ignorar mayúsculas/minúsculas)
 - **Diacritic-insensitive** recomendado (ignorar acentos) para mayor usabilidad
 - Comparación sobre valores **stringificados** (números/fechas convertidos a string)
-- Si el término está vacío -> mostrar todos o mantener estado según UX (no filtrar)
+- Si el término está vacío -> mostrar todas las entidades, sin filtrar
 - Si no hay coincidencias -> mostrar estado vacío claro con opción de reintentar (FR-005)
 
 ## Comportamiento

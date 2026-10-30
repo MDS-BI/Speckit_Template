@@ -72,7 +72,7 @@ Ver `contracts/module-config.md` para el esquema completo. Resumen:
 - **Entidad 1 — N Documentos**: cada documento referencia exactamente una entidad mediante `entity_id`.
 - **Borrado en cascada**: al eliminar una entidad se eliminan todos los documentos con su `entity_id` (FR-003, SC-002).
 - **Validación de referencia**: no se puede crear/editar un documento con un `entity_id` inexistente (FR-009).
-- **Búsqueda**: se indexan los campos base y los valores de `customFields` de las entidades (FR-004).
+- **Búsqueda**: se indexan `name`, `code`, `description` y los valores de `customFields` de las entidades; el término vacío devuelve todas (FR-004).
 
 ## Claves de localStorage
 
@@ -80,5 +80,6 @@ Ver `contracts/module-config.md` para el esquema completo. Resumen:
 |---|---|
 | `erp.entities` | Array de entidades serializadas |
 | `erp.documents` | Array de documentos serializados |
+| `erp.schemaVersion` | Versión del esquema (`1.0.0`) escrita en cada guardado |
 
 > Los nombres exactos de las claves pueden ajustarse en `src/storage.js`; el contrato relevante es el esquema de los registros y la integridad referencial, no el nombre de la clave.
