@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ERP Base</title>
+  <link rel="stylesheet" href="./src/styles.css">
+</head>
+<body>
+  <div id="app">
+    <header id="topbar" class="topbar">
+      <div class="brand">
+        <span id="brand-logo" class="brand-logo"></span>
+        <span id="brand-name" class="brand-name"></span>
+      </div>
+    </header>
+    <div class="workspace">
+      <aside id="sidebar" class="sidebar">
+        <button id="nav-dashboard" class="nav-item" data-module="dashboard">Panel</button>
+        <button id="nav-entities" class="nav-item" data-module="entities">Entidades</button>
+        <button id="nav-documents" class="nav-item" data-module="documents">Documentos</button>
+        <button id="nav-search" class="nav-item" data-module="search">Buscar</button>
+      </aside>
+      <main class="content">
+        <section id="view-dashboard" class="view">
+          <h1 id="dashboard-title">Panel</h1>
+          <div class="quick-actions">
+            <button id="qa-new-entity">Nueva entidad</button>
+            <button id="qa-new-document">Nuevo documento</button>
+            <button id="qa-manage-entities">Abrir gestión de entidades</button>
+            <button id="qa-search">Buscar registros</button>
+          </div>
+          <div class="stats">
+            <div class="stat-card"><span id="stat-entities">0</span> <span id="stat-entities-label">Entidades</span></div>
+            <div class="stat-card"><span id="stat-documents">0</span> <span id="stat-documents-label">Documentos</span></div>
+          </div>
+        </section>
+
+        <section id="view-entities" class="view" hidden>
+          <h1 id="entities-title">Entidades</h1>
+          <form id="entity-form" novalidate>
+            <div>
+              <label for="name">Nombre</label>
+              <input id="name" name="name">
+              <div id="error-name" class="error"></div>
+            </div>
+            <div>
+              <label for="code">Código</label>
+              <input id="code" name="code">
+              <div id="error-code" class="error"></div>
+            </div>
+            <div>
+              <label for="taxId">Identificación fiscal</label>
+              <input id="taxId" name="taxId">
+            </div>
+            <div>
+              <label for="email">Correo electrónico</label>
+              <input id="email" name="email">
+              <div id="error-email" class="error"></div>
+            </div>
+            <div>
+              <label for="phone">Teléfono</label>
+              <input id="phone" name="phone">
+            </div>
+            <div>
+              <label for="address">Dirección</label>
+              <input id="address" name="address">
+            </div>
+            <div>
+              <label for="category">Categoría</label>
+              <input id="category" name="category">
+            </div>
+            <div>
+              <label for="description">Descripción</label>
+              <input id="description" name="description">
+            </div>
+            <div>
+              <label for="targetDate">Fecha objetivo</label>
+              <input id="targetDate" name="targetDate" type="date">
+              <div id="error-targetDate" class="error"></div>
+            </div>
+            <div>
+              <label for="creditLimit">Límite de crédito</label>
+              <input id="creditLimit" name="creditLimit">
+              <div id="error-creditLimit" class="error"></div>
+            </div>
+            <div>
+              <label for="paymentTerms">Condiciones de pago</label>
+              <input id="paymentTerms" name="paymentTerms">
+            </div>
+            <div id="custom-entity-fields"></div>
+            <button type="submit">Guardar</button>
+          </form>
+          <div>
+            <label for="edit-entity">Editar entidad</label>
+            <select id="edit-entity"></select>
+            <button id="load-entity">Cargar</button>
+            <button id="delete-entity">Eliminar</button>
+          </div>
+          <div id="entity-list"></div>
+        </section>
+
+        <section id="view-documents" class="view" hidden>
+          <h1 id="documents-title">Documentos</h1>
+          <form id="document-form" novalidate>
+            <div>
+              <label for="document-entity">Entidad</label>
+              <select id="document-entity"></select>
+              <div id="error-document-entity" class="error"></div>
+            </div>
+            <div>
+              <label for="series">Serie</label>
+              <input id="series" name="series">
+            </div>
+            <div>
+              <label for="folio">Folio</label>
+              <input id="folio" name="folio">
+              <div id="error-folio" class="error"></div>
+            </div>
+            <div>
+              <label for="startDate">Fecha de inicio</label>
+              <input id="startDate" name="startDate" type="date">
+              <div id="error-startDate" class="error"></div>
+            </div>
+            <div>
+              <label for="endDate">Fecha de fin</label>
+              <input id="endDate" name="endDate" type="date">
+              <div id="error-endDate" class="error"></div>
+            </div>
+            <div>
+              <label for="quantity">Cantidad</label>
+              <input id="quantity" name="quantity">
+              <div id="error-quantity" class="error"></div>
+            </div>
+            <div>
+              <label for="subtotal">Subtotal</label>
+              <input id="subtotal" name="subtotal">
+              <div id="error-subtotal" class="error"></div>
+            </div>
+            <div>
+              <label for="discount">Descuento</label>
+              <input id="discount" name="discount">
+              <div id="error-discount" class="error"></div>
+            </div>
+            <div>
+              <label for="taxAmount">Impuesto</label>
+              <input id="taxAmount" name="taxAmount">
+              <div id="error-taxAmount" class="error"></div>
+            </div>
+            <div>
+              <label for="totalAmount">Total</label>
+              <input id="totalAmount" name="totalAmount">
+              <div id="error-totalAmount" class="error"></div>
+            </div>
+            <div>
+              <label for="currency">Moneda</label>
+              <input id="currency" name="currency">
+            </div>
+            <div>
+              <label for="docPaymentTerms">Condiciones de pago</label>
+              <input id="docPaymentTerms" name="docPaymentTerms">
+            </div>
+            <div>
+              <label for="notes">Notas</label>
+              <input id="notes" name="notes">
+            </div>
+            <div>
+              <label for="status">Estado</label>
+              <select id="status"></select>
+              <input id="status-free" name="status-free">
+              <div id="error-status" class="error"></div>
+            </div>
+            <div id="custom-document-fields"></div>
+            <button type="submit">Guardar documento</button>
+          </form>
+          <div>
+            <label for="edit-document">Editar documento</label>
+            <select id="edit-document"></select>
+            <button id="load-document">Cargar</button>
+            <button id="delete-document">Eliminar</button>
+          </div>
+          <div id="document-list"></div>
+        </section>
+
+        <section id="view-search" class="view" hidden>
+          <h1 id="search-title">Buscar</h1>
+          <input id="search-input" placeholder="Buscar...">
+          <div id="search-results"></div>
+          <div id="search-empty" hidden>No hay resultados</div>
+        </section>
+      </main>
+    </div>
+  </div>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

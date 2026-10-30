@@ -38,6 +38,7 @@ specs/001-erp-base-module/
 ├── research.md
 ├── data-model.md
 ├── quickstart.md
+├── spec.md
 ├── contracts/
 └── tasks.md
 ```

@@ -1,79 +1,80 @@
-# Contrato de Almacenamiento de Entidades
+# Contrato de Almacenamiento de Entidades y Documentos (Ampliado)
 
 ## Propósito
 
-La aplicación almacena los registros de entidad localmente en el navegador usando `localStorage`.
+Extiende `contracts/entity-storage.md` con claves, versionado, passthrough de campos personalizados, errores estructurados y atomicidad de cascada.
 
-## Forma de los Datos
+## Claves de localStorage
 
-Cada registro de entidad debe incluir:
+Usar claves versionadas/namespaced:
 
-- `id`: cadena única
-- `entity_id`: cadena única, generada automáticamente, usada para vincular documentos
-- `name`: cadena no vacía
-- `code`: cadena no vacía
-- `taxId`: cadena opcional (identificación fiscal)
-- `email`: cadena opcional con formato de correo válido cuando está presente
-- `phone`: cadena opcional
-- `address`: cadena opcional
-- `category`: cadena opcional
-- `description`: cadena opcional
-- `targetDate`: cadena de fecha opcional (YYYY-MM-DD) válida cuando está presente
-- `creditLimit`: número opcional no negativo
-- `paymentTerms`: cadena opcional
-- `createdAt`: cadena de marca de tiempo ISO
-- `updatedAt`: cadena de marca de tiempo ISO
+| Clave | Contenido |
+| --- | --- |
+| `erp.entities` | Array de entidades |
+| `erp.documents` | Array de documentos |
+| `erp.schemaVersion` | Versión de esquema (ej. `1.0.0`) |
+
+## Versionado de esquema
+
+- Cada blob puede incluir metadatos: `{ version: '1.0.0', data: [...] }` o simplemente almacenar array con `erp.schemaVersion` global
+- Al leer, si versión difiere -> intentar migración o fallback seguro
+- Migraciones deben ser backward-compatible cuando sea posible
+
+## Forma de los datos
+
+Ver `entity-storage.md` base. Además:
+- **Campos personalizados**: cualquier propiedad extra en entidad/documento debe persistirse tal como está (passthrough). No eliminar claves desconocidas al guardar/leer.
+- **Timestamps**: `createdAt` y `updatedAt` en formato ISO 8601. Deben ser establecidos/actualizados por helpers de almacenamiento (no confiar solo en el caller).
 
 ## Operaciones
 
-- `loadEntities()`: devuelve todas las entidades almacenadas.
-- `saveEntities(entities)`: persiste la lista completa.
-- `addEntity(entity)`: añade una nueva entidad.
-- `updateEntity(id, updates)`: actualiza una entidad existente.
-- `deleteEntity(id)`: elimina una entidad por id.
+### Entidades
+- `loadEntities()`: devuelve todas las entidades almacenadas (array). Si no existe -> []
+- `saveEntities(entities)`: persiste lista completa. Debe validar estructura básica.
+- `addEntity(entity)`: añade nueva entidad. Genera `id` y `entity_id` únicos si faltan. Establece `createdAt`/`updatedAt`. Valida según contrato de validación.
+- `updateEntity(id, updates)`: actualiza entidad existente. Actualiza `updatedAt`. Merge con campos existentes (preserva campos personalizados). Valida.
+- `deleteEntity(id)`: elimina entidad por id. **Debe** eliminar documentos asociados vía `deleteDocumentsForEntity`.
 
-## Almacenamiento de Documentos
+### Documentos
+- `loadDocuments()`: devuelve todos los documentos
+- `saveDocuments(documents)`: persiste lista completa
+- `addDocument(document)`: añade documento. Genera `id`. Establece timestamps. Valida `entity_id` existente. Aplica ciclo de vida si configurado.
+- `updateDocument(id, updates)`: actualiza documento. Valida transiciones si hay `statusLifecycle`. Actualiza `updatedAt`.
+- `deleteDocument(id)`: elimina documento por id
+- `deleteDocumentsForEntity(entityId)`: elimina todos los documentos con ese `entity_id`. Debe ser llamado por `deleteEntity` para garantizar integridad referencial.
 
-Cada registro de documento debe incluir:
+## Validación y errores
 
-- `id`: cadena única
-- `entity_id`: el entity_id autogenerado de la entidad vinculada
-- `series`: cadena opcional que agrupa folios consecutivos
-- `folio`: entero positivo obligatorio; junto con la serie forma el número oficial del documento
-- `startDate`: cadena de fecha de calendario válida
-- `endDate`: cadena de fecha de calendario válida, igual o posterior a startDate
-- `quantity`: entero positivo opcional
-- `subtotal`: número no negativo opcional
-- `discount`: número no negativo opcional; no puede superar el subtotal
-- `taxAmount`: número no negativo opcional
-- `totalAmount`: número no negativo opcional
-- `currency`: cadena opcional
-- `paymentTerms`: cadena opcional
-- `notes`: cadena opcional
-- `status`: cadena opcional
-- `createdAt`: cadena de marca de tiempo ISO
-- `updatedAt`: cadena de marca de tiempo ISO
+Usar `ValidationError[]` (ver `contracts/validation.md`).
 
-Operaciones:
+Casos de error esperados:
+- `addEntity` con `name` o `code` vacío -> `REQUIRED`
+- `addEntity` con `email` inválido -> `INVALID_EMAIL`
+- `addEntity` con `creditLimit` negativo -> `NEGATIVE_NOT_ALLOWED`
+- `addEntity` con `targetDate` inválido -> `INVALID_DATE`
+- `addDocument` con `entity_id` inexistente -> `MISSING_ENTITY_REF`
+- `addDocument` sin `folio` entero positivo -> `INVALID_FOLIO`
+- `addDocument` con `endDate` < `startDate` -> `END_BEFORE_START`
+- `addDocument` con `discount` > `subtotal` -> `DISCOUNT_EXCEEDS_SUBTOTAL`
+- `updateDocument` con transición inválida bajo ciclo de vida -> error con explicación clara
 
-- `loadDocuments()`: devuelve todos los documentos almacenados.
-- `saveDocuments(documents)`: persiste la lista completa.
-- `addDocument(document)`: añade un nuevo documento.
-- `updateDocument(id, updates)`: actualiza un documento existente.
-- `deleteDocument(id)`: elimina un documento por id.
-- `deleteDocumentsForEntity(entityId)`: elimina todos los documentos vinculados a una entidad eliminada.
+## Integridad referencial
 
-## Expectativas de Validación
+- Al eliminar entidad, **todos** los documentos con `entity_id` coincidente deben eliminarse
+- No deben quedar documentos huérfanos
+- Operación debe ser consistente (si posible, atómica desde perspectiva del caller)
 
-- Un `name` o `code` faltante debe rechazarse antes de la persistencia.
-- Un `email` presente debe tener formato de correo válido y un `creditLimit` presente debe ser un número no negativo.
-- Un documento sin `folio` entero positivo debe rechazarse; un `discount` mayor que el `subtotal` debe rechazarse.
-- Un entity_id debe generarse automáticamente y debe ser único.
-- Un documento sin un `entity_id` que coincida con una entidad existente debe rechazarse.
-- Eliminar una entidad también debe eliminar todos los documentos vinculados a su entity_id.
-- Las operaciones de almacenamiento deben preservar el orden actual de la lista y actualizar las marcas de tiempo.
+## Extensibilidad
 
-## Expectativas de Extensibilidad
+- Campos extra (custom fields) deben preservarse sin transformación
+- Esquema base estable para módulos personalizados
+- Helpers deben ser genéricos, validación delegada/configurable donde aplique
 
-- Los campos adicionales añadidos por módulos personalizados deben persistirse junto a los campos base sin manejo especial en la capa de almacenamiento.
-- Las operaciones base anteriores permanecen estables para que los módulos personalizados puedan construir sobre ellas sin modificación.
+## Pruebas esperadas
+
+- Generación de `id`/`entity_id` únicos
+- Passthrough de custom fields
+- Eliminación en cascada
+- Validación de todos los casos base
+- Transiciones de estado válidas/inválidas
+- Timestamps actualizados correctamente

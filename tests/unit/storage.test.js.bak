@@ -1,0 +1,40 @@
+import { describe, it, expect, beforeEach } from 'vitest';
+import { clearAll, loadEntities, addEntity, updateEntity, deleteEntity, validateEntity, searchEntities, loadDocuments, addDocument, updateDocument, deleteDocument, deleteDocumentsForEntity, validateDocument } from '../../src/storage.js';
+import { setActiveConfig } from '../../src/module-config.js';
+
+const store = new Map();
+globalThis.localStorage = {
+  getItem: (k) => (store.has(k) ? store.get(k) : null),
+  setItem: (k, v) => store.set(k, String(v)),
+  removeItem: (k) => store.delete(k),
+  clear: () => store.clear()
+};
+
+beforeEach(() => {
+  store.clear();
+  setActiveConfig(null);
+});
+
+describe('entity storage', () => {
+  it('validates entity name and code', () => {
+    expect(validateEntity({name:'', code:''}).valid).toBe(false);
+    expect(validateEntity({name:'Acme', code:''}).valid).toBe(false);
+    expect(validateEntity({name:'A', code:'B'}).valid).toBe(true);
+    expect(validateEntity({name:'', code:''}).errors.name).toContain('obligatorio');
+  });
+
+  it('adds and loads entities', () => {
+    const e = addEntity({name:'Acme', code:'AC-001'});
+    const all = loadEntities();
+    expect(all.length).toBe(1);
+    expect(all[0].id).toBe(e.id);
+  });
+
+  it('generates a unique entity_id for each entity', () => {
+    const e1 = addEntity({name:'Acme', code:'AC-001'});
+    const e2 = addEntity({name:'Globex', code:'GL-002'});
+    expect(e1.entity_id).toBeDefined();
+    expect(e1.entity_id).not.toBe(e2.entity_id);
+    expect(loadEntities()[0].entity_id).toBe(e1.entity_id);
+  });
+});
