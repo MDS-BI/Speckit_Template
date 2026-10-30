@@ -2,7 +2,7 @@
 
 ## Propósito
 
-Definir cómo se aplica el color de acento configurado al marco del workspace, con fallbacks seguros (FR-038).
+Definir cómo se aplica el color de acento configurado al marco del workspace, con fallbacks seguros (FR-023).
 
 ## Configuración
 

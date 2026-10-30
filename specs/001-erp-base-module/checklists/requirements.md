@@ -31,4 +31,4 @@
 
 ## Notas
 
-- La especificación está lista para la planificación y la implementación.
+- La especificación está lista para la planificación. La implementación aún no está presente en el repositorio (ver Estado en `spec.md`).

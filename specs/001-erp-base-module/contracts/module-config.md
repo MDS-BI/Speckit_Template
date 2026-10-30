@@ -2,7 +2,7 @@
 
 ## Propósito
 
-Define cómo se adapta el módulo base a un módulo ERP personalizado mediante un único archivo de configuración. La configuración se carga al inicio (FR-023), se aplica a todas las pantallas y debe degradarse de forma segura (FR-024, FR-025).
+Define cómo se adapta el módulo base a un módulo ERP personalizado mediante un único archivo de configuración. La configuración se carga al inicio (FR-016), se aplica a todas las pantallas y debe degradarse de forma segura (FR-017).
 
 ## Ubicación
 
@@ -68,7 +68,7 @@ Cuando no hay configuración o es parcialmente inválida, usar:
 
 ## Reglas de validación
 
-- `moduleName`: debe ser string no vacío. Si falta o vacío -> error claro, usar predeterminado o bloquear inicialización con mensaje legible (FR-025).
+- `moduleName`: debe ser string no vacío. Si falta o vacío -> error claro, usar predeterminado o bloquear inicialización con mensaje legible (FR-017).
 - `labels`: si se proporciona parcialmente, completar con predeterminados.
 - `customFields`:
   - `target` debe ser `entity` o `document`
@@ -80,7 +80,7 @@ Cuando no hay configuración o es parcialmente inválida, usar:
 - `statusLifecycle`:
   - `statuses` debe ser array no vacío de strings únicos
   - `transitions` debe cubrir al menos los estados presentes o ser consistente; toda transición debe ir a un estado listado en `statuses`
-  - Si inválido -> ignorar ciclo de vida (pasar a estado libre) e informar claramente (FR-025)
+  - Si inválido -> ignorar ciclo de vida (pasar a estado libre) e informar claramente (FR-017)
 - `theme.accentColor`:
   - Debe ser un color CSS válido (ej. `#RRGGBB`, `rgb(...)`, `hsl(...)`, nombre CSS válido). 
   - Si ausente o inválido -> usar valor predeterminado del sistema, sin errores fatales.
@@ -89,14 +89,14 @@ Cuando no hay configuración o es parcialmente inválida, usar:
 
 - Los errores de configuración deben mostrarse de forma clara al arrancar (consola + UI si aplica) sin crashear silenciosamente.
 - Configuraciones parcialmente válidas deben aplicarse con partes válidas y usar predeterminados para las inválidas, informando los problemas.
-- Nunca se deben filtrar términos base al UI si hay configuración válida (FR-006-like clarity, FR-025).
+- Nunca se deben filtrar términos base al UI si hay configuración válida (FR-006, FR-017).
 
 ## Integración
 
 - Exportar configuración normalizada y validadora desde `src/module-config.js`.
 - `src/main.js` y `src/app.js` deben recibirla y pasarla a shell, dashboard, formularios, listas y búsqueda.
 - `src/app.js` debe aplicar `theme.accentColor` como variable CSS personalizada (ej. `--accent-color`) en el alcance del workspace shell.
-- Las etiquetas derivadas deben usarse en todo el UI (FR-029).
+- Las etiquetas derivadas deben usarse en todo el UI (FR-018).
 
 ## Pruebas esperadas
 

@@ -2,7 +2,7 @@
 
 ## Propósito
 
-Definir el marco persistente ERP: barra superior con marca, barra lateral de navegación de módulos, enrutamiento por módulos y comportamiento responsivo/accesible (HU13, FR-011, FR-012, FR-037, FR-039).
+Definir el marco persistente ERP: barra superior con marca, barra lateral de navegación de módulos, enrutamiento por módulos y comportamiento responsivo/accesible (HU13, FR-011, FR-012, FR-026).
 
 ## Módulos
 
@@ -52,7 +52,7 @@ Módulos disponibles:
 - `src/components/shell.js`: renderiza shell, logotipo monograma, navegación, estado activo
 - `src/app.js`: gestiona enrutamiento por módulo y pasa estado/config a shell
 - `index.html`: estructura base con shell
-- Debe usar etiquetas desde `ModuleConfig` (FR-029)
+- Debe usar etiquetas desde `ModuleConfig` (FR-018)
 - Resaltar con color de acento si está configurado (integrado con theming)
 
 ## Pruebas esperadas

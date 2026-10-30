@@ -2,7 +2,7 @@
 
 ## Propósito
 
-Unificar la validación para entidades, documentos, campos personalizados y configuración, con una forma de error consistente para asegurar retroalimentación clara al usuario (FR-006, FR-027).
+Unificar la validación para entidades, documentos, campos personalizados y configuración, con una forma de error consistente para asegurar retroalimentación clara al usuario (FR-006, FR-019).
 
 ## Forma de error
 
@@ -78,8 +78,8 @@ interface ValidationError {
 - Validación previa al guardado (guardar debe fallar con errores si hay errores)
 - Errores deben mostrarse asociados al campo cuando sea posible
 - Mensajes claros, accionables (explicar qué se necesita)
-- No fallar silenciosamente (FR-025)
-- Mismo patrón de retroalimentación para base y campos personalizados (FR-027)
+- No fallar silenciosamente (FR-017)
+- Mismo patrón de retroalimentación para base y campos personalizados (FR-019)
 
 ## Integración
 
