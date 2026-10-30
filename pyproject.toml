@@ -11,9 +11,6 @@ dependencies = [
     "specify-cli>=1.0.1",
 ]
 
-[project.scripts]
-speckit-template = "speckit_template:main"
-
 [build-system]
 requires = ["uv_build>=0.12.5,<0.13.0"]
 build-backend = "uv_build"
